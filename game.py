@@ -2,7 +2,7 @@ class GomokuGame:
     def __init__(self, board_size=10):
         self.board_size = board_size
         self.board = [['_' for _ in range(board_size)] for _ in range(board_size)]
-        self.current_player = 'B'  # 'X' represents Player 1, 'O' represents Player 2
+        self.current_player = 'W'  # 'W' represents Player 1, 'B' represents Player 2
 
     def switch_player(self):
         if self.current_player == 'B':
@@ -21,20 +21,69 @@ class GomokuGame:
         for row in self.board:
             print(' '.join(row))
 
+    def check_win_condition(self):
+        consecutive_piece = 5
 
-# Test the implementation
+        for row in range(self.board_size):
+            for col in range(self.board_size):
+                if self.board[row][col] != "_":
+
+                    # Check row wise win condition
+                    win = True
+                    for i in range(consecutive_piece):
+                        if (col + i) >= self.board_size or self.board[row][col + i] != self.board[row][col]:
+                            win = False
+                            break
+
+                    if win:
+                        print(f"{self.current_player} won row wise at {row} and {col}")
+                        return True
+
+                    # Check column wise win condition
+                    win = True
+                    for i in range(consecutive_piece):
+                        if (row + i) >= self.board_size or self.board[row + i][col] != self.board[row][col]:
+                            win = False
+                            break
+                    if win:
+                        print(f"{self.current_player} won column wise at {row} and {col}")
+                        return True
+
+                    # Check right diagonal win condition
+                    win = True
+                    for i in range(consecutive_piece):
+                        if (row + i) >= self.board_size or (col + i) >= self.board_size or self.board[row + i][
+                            col + i] != self.board[row][col]:
+                            win = False
+                            break
+                    if win:
+                        print(f"{self.current_player} won diagonal wise at {row} and {col}")
+                        return True
+        return False
+
+
 if __name__ == "__main__":
     game = GomokuGame()
     game.display_board()
 
     while True:
         print(f"\t{game.current_player}'s turn")
-        row = int(input(f"Enter row (1-{game.board_size}): ")) - 1
-        col = int(input(f"Enter column (1-{game.board_size}): ")) - 1
 
-        print(row, col)
+        try:
+            row = int(input(f"Enter row (1-{game.board_size}): ")) - 1
+            col = int(input(f"Enter column (1-{game.board_size}): ")) - 1
+
+            print(row, col)
+        except:
+            print("Invalid input type!!")
+            continue
 
         if game.make_move(row, col):
             game.display_board()
+            if game.check_win_condition():
+                print("\n\t" + ("B WON" if game.current_player == "W" else "A WON"))
+                break
+
+
         else:
             print("Invalid move. Try again.")
