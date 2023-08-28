@@ -61,29 +61,3 @@ class GomokuGame:
                         return True
         return False
 
-
-if __name__ == "__main__":
-    game = GomokuGame()
-    game.display_board()
-
-    while True:
-        print(f"\t{game.current_player}'s turn")
-
-        try:
-            row = int(input(f"Enter row (1-{game.board_size}): ")) - 1
-            col = int(input(f"Enter column (1-{game.board_size}): ")) - 1
-
-            print(row, col)
-        except:
-            print("Invalid input type!!")
-            continue
-
-        if game.make_move(row, col):
-            game.display_board()
-            if game.check_win_condition():
-                print("\n\t" + ("B WON" if game.current_player == "W" else "A WON"))
-                break
-
-
-        else:
-            print("Invalid move. Try again.")
