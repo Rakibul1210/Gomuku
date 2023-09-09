@@ -1,4 +1,4 @@
-
+from Controller import Controller
 class AIPlayer:
     def __init__(self, player_marker, max_depth=3):
         self.player_marker = player_marker
@@ -43,7 +43,8 @@ class AIPlayer:
 
     def minimax(self, game_state, depth, alpha, beta, maximizing_player):
         if depth == 0 or self.is_game_over(game_state):
-            return self.evaluate(game_state)
+            controller = Controller()
+            return controller.evaluate(game_state)
 
         if maximizing_player:
             best_score = -float("inf")
@@ -68,7 +69,5 @@ class AIPlayer:
                     break  # Alpha cutoff, prune the rest of the branches
             return best_score
 
-    def evaluate(self, game_state):
-        # Implement your evaluation function here
-        # This function should return a score indicating the desirability of the game state
-        pass
+
+
