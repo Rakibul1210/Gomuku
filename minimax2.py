@@ -1,3 +1,6 @@
+
+import copy
+
 class Minimax:
     def __init__(self):
         self.evaluationCount = 0
@@ -20,12 +23,10 @@ class Minimax:
         return whiteScore / blackScore
 
     def getScore(self, game_state, forBlack, blacksTurn):
-        boardMatrix = game_state
-        return (
-            self.evaluateHorizontal(boardMatrix, forBlack, blacksTurn)
-            + self.evaluateVertical(boardMatrix, forBlack, blacksTurn)
-            + self.evaluateDiagonal(boardMatrix, forBlack, blacksTurn)
-        )
+        boardMatrix = copy.deepcopy(game_state)
+        score = self.evaluateHorizontal(boardMatrix, forBlack, blacksTurn) + self.evaluateVertical(boardMatrix, forBlack, blacksTurn) + self.evaluateDiagonal(boardMatrix, forBlack, blacksTurn)
+        print("score --> ", score)
+        return score
 
     def evaluateHorizontal(self, boardMatrix, forBlack, playersTurn):
         consecutive = 0
@@ -34,7 +35,10 @@ class Minimax:
 
         for i in range(len(boardMatrix)):
             for j in range(len(boardMatrix[0])):
+                print("in here", i," ", j, " ", boardMatrix[i][j])
+
                 if boardMatrix[i][j] == (2 if forBlack else 1):
+                # if boardMatrix[i][j] == ('B' if forBlack else 'W'):
                     consecutive += 1
                 elif boardMatrix[i][j] == 0:
                     if consecutive > 0:
@@ -56,6 +60,7 @@ class Minimax:
             consecutive = 0
             blocks = 2
 
+        print("horizontal score -->", score)
         return score
 
     def evaluateVertical(self, boardMatrix, forBlack, playersTurn):
@@ -203,11 +208,11 @@ class Minimax:
     #     return move
 
     def minimaxSearchAB(self, depth, game_state, maxPlayer, alpha, beta,player_marker):
-        print("----------in minimax----------")
+        print("----------in minimax depth----------", depth)
         if depth == 0:
             lala=[self.evaluateBoardForWhite(game_state, not maxPlayer), None, None]
-            print("final move")
-            print(lala)
+            # print("final move")
+            # print(lala)
             return lala
 
         allPossibleMoves = self.generateMoves(game_state)
@@ -223,20 +228,18 @@ class Minimax:
             alpha = -1.0
 
             for move in allPossibleMoves:
-                # from copy import copy, deepcopy
-                # dummyBoard = deepcopy(game_state)
-                dummyBoard=game_state
+                # from deepcopy import deepcopy, deepdeepcopy
+                # dummyBoard = deepdeepcopy(game_state)
+                dummyBoard=copy.deepcopy(game_state)
                 if dummyBoard[move[0]][move[1]]!='_':
-                    continue;
+                    continue
                 dummyBoard[move[0]][move[1]]='B';
-                if depth==0:
-                    print(depth)
-                    print(dummyBoard)
+
                 # dummyBoard.addStoneNoGUI(move[1], move[0], not maxPlayer)  # Pass the player_marker
 
                 tempMove = self.minimaxSearchAB(depth - 1, dummyBoard, not maxPlayer, alpha, beta,player_marker)
                 print("--------searching moves--------------")
-                print("temp move",tempMove)
+                print("temp move", tempMove)
                 dummyBoard[move[0]][move[1]] = '_';
                 if tempMove[0] > alpha:
                     alpha = tempMove[0]
@@ -252,7 +255,7 @@ class Minimax:
             beta = 100000000.0
 
             for move in allPossibleMoves:
-                dummyBoard = game_state
+                dummyBoard = copy.deepcopy(game_state)
                 # dummyBoard.addStoneNoGUI(move[1], move[0], not maxPlayer)  # Pass the player_marker
 
                 tempMove = self.minimaxSearchAB(depth - 1, dummyBoard, not maxPlayer, alpha, beta, player_marker)
@@ -275,7 +278,7 @@ class Minimax:
 
         for move in allPossibleMoves:
             self.evaluationCount += 1
-            dummyBoard = game_state
+            dummyBoard = copy.deepcopy(game_state)
             # dummyBoard.addStoneNoGUI(move[1], move[0], player_marker == 'B')  # Pass the player_marker
 
             if self.getScore(dummyBoard, False, False) >= self.winScore:

@@ -8,7 +8,7 @@ class AIPlayer:
         print(f"{self.player_marker}'s turn (AI)")
 
         # Define the depth for minimax search (you can adjust this)
-        depth = 3
+        depth = 2
 
         # Calculate the next move using the Minimax algorithm
         move = self.minimax.calculateNextMove(depth, board, self.player_marker)

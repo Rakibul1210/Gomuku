@@ -1,5 +1,5 @@
 class GomokuGame:
-    def __init__(self, board_size=10):
+    def __init__(self, board_size=5):
         self.board_size = board_size
         self.board = [['_' for _ in range(board_size)] for _ in range(board_size)]
         self.current_player = 'W'  # 'W' represents Player 1, 'B' represents Player 2
