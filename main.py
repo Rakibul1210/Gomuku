@@ -1,5 +1,5 @@
 from gomokuGame import GomokuGame
-from AIPlayer import AIPlayer
+from aiPlayer import AIPlayer
 import time
 
 
