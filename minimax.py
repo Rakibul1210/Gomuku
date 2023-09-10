@@ -181,7 +181,7 @@ class Minimax:
         if bestMove is not None:
             move[0] = bestMove[1]
             move[1] = bestMove[2]
-            self.gameOver = True
+            # self.gameOver = True
         else:
             bestMove = self.minimaxSearchAB(depth, game_state, True, -1.0, self.getWinScore(),player_marker)
             if bestMove is None:
@@ -197,10 +197,10 @@ class Minimax:
     def minimaxSearchAB(self, depth, game_state, maxPlayer, alpha, beta,player_marker):
         # print("----------in minimax depth----------", depth)
         if depth == 0:
-            lala=[self.evaluateBoardForWhite(game_state, not maxPlayer), None, None]
+            score =[self.evaluateBoardForWhite(game_state, not maxPlayer), None, None]
             # print("final move")
             # print(lala)
-            return lala
+            return score
 
         # allPossibleMoves = self.generateMoves(game_state)
         allPossibleMoves = self.generate_all_adjacent_move(game_state)
@@ -222,7 +222,7 @@ class Minimax:
                 dummyBoard=copy.deepcopy(game_state)
                 # if dummyBoard[move[0]][move[1]]!='_':
                 #     continue
-                dummyBoard[move[0]][move[1]]='W'
+                dummyBoard[move[0]][move[1]]='W '
 
                 # dummyBoard.addStoneNoGUI(move[1], move[0], not maxPlayer)  # Pass the player_marker
 
@@ -233,7 +233,8 @@ class Minimax:
                 if tempMove[0] > alpha:
                     alpha = tempMove[0]
 
-                if tempMove[0] >= beta:
+                # if tempMove[0] >= beta:
+                if alpha >= beta:
                     return tempMove
 
                 if tempMove[0] > bestMove[0]:
@@ -272,6 +273,8 @@ class Minimax:
         for move in allPossibleMoves:
             self.evaluationCount += 1
             dummyBoard = copy.deepcopy(game_state)
+            dummyBoard[move[0]][move[1]] = 'W'
+
             # dummyBoard.addStoneNoGUI(move[1], move[0], player_marker == 'B')  # Pass the player_marker
 
             if self.getScore(dummyBoard, False, False) >= self.winScore:
