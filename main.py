@@ -32,9 +32,12 @@ if __name__ == "__main__":
             print("Invalid move. Try again.")
 
         if game_mode == 2 and game.current_player == 'B':
-            print("AI in thinking")
-            time.sleep(3)
+
+            start_time = time.time()
             ai_move = ai_player.make_move(game.board)
+            end_time = time.time();
+
+            print("Time taken: ", end_time - start_time)
             print(f"AI's move: {ai_move}")
             game.make_move(ai_move[0], ai_move[1])
             game.display_board()
