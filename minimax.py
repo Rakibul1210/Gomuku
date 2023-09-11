@@ -1,12 +1,11 @@
-
 import copy
+
 
 class Minimax:
     def __init__(self):
         self.evaluationCount = 0
         self.winScore = 100000000
         self.gameOver = False
-
 
     def getGameStatus(self):
         return self.gameOver
@@ -24,13 +23,16 @@ class Minimax:
 
     def getScore(self, game_state, forBlack, blacksTurn):
         boardMatrix = copy.deepcopy(game_state)
-        score = self.evaluateHorizontal(boardMatrix, forBlack, blacksTurn) + self.evaluateVertical(boardMatrix, forBlack, blacksTurn) + self.evaluateDiagonal(boardMatrix, forBlack, blacksTurn)
+        score = self.evaluateHorizontal(boardMatrix, forBlack, blacksTurn) + self.evaluateVertical(boardMatrix,
+                                                                                                   forBlack,
+                                                                                                   blacksTurn) + self.evaluateDiagonalLeft(
+            boardMatrix, forBlack, blacksTurn) + self.evaluateDiagonalRight(boardMatrix, forBlack, blacksTurn)
         # print("score --> ", score)
         return score
 
     def evaluateHorizontal(self, boardMatrix, forBlack, playersTurn):
         consecutive = 0
-        blocks = 2
+        blocks = 1
         score = 0
         # print(type(boardMatrix[0][0]))
         for i in range(len(boardMatrix)):
@@ -69,7 +71,8 @@ class Minimax:
 
     def evaluateVertical(self, boardMatrix, forBlack, playersTurn):
         consecutive = 0
-        blocks = 2
+        # blocks = 2
+        blocks = 1
         score = 0
 
         for j in range(len(boardMatrix[0])):
@@ -99,19 +102,59 @@ class Minimax:
 
         return score
 
-    def evaluateDiagonal(self, boardMatrix, forBlack, playersTurn):
+    def evaluateDiagonalLeft(self, boardMatrix, forBlack, playersTurn):
         consecutive = 0
-        blocks = 2
+        blocks = 1
         score = 0
 
         # for k in range(-len(boardMatrix) + 1, len(boardMatrix)):
-        for k in range(0, 2*(len(boardMatrix)-1)+1):
+        for k in range(0, 2 * (len(boardMatrix) - 1) + 1):
             # iStart = max(0, k)
-            iStart = max(0, k-len(boardMatrix)+1)
+            iStart = max(0, k - len(boardMatrix) + 1)
             # iEnd = min(len(boardMatrix) + k - 1, len(boardMatrix) - 1)
             iEnd = min(len(boardMatrix) - 1, k)
             for i in range(iStart, iEnd + 1):
-                j = k-i
+                # j = k-i
+                j = i - k
+
+                if boardMatrix[i][j] == ('B' if forBlack else 'W'):
+                    consecutive += 1
+                elif boardMatrix[i][j] == '_':
+                    if consecutive > 0:
+                        blocks -= 1
+                        score += self.getConsecutiveSetScore(consecutive, blocks, forBlack == playersTurn)
+                        consecutive = 0
+                        blocks = 1
+                    else:
+                        blocks = 1
+                elif consecutive > 0:
+                    score += self.getConsecutiveSetScore(consecutive, blocks, forBlack == playersTurn)
+                    consecutive = 0
+                    blocks = 2
+                else:
+                    blocks = 2
+
+            if consecutive > 0:
+                score += self.getConsecutiveSetScore(consecutive, blocks, forBlack == playersTurn)
+            consecutive = 0
+            blocks = 2
+
+        return score
+
+    def evaluateDiagonalRight(self, boardMatrix, forBlack, playersTurn):
+        consecutive = 0
+        blocks = 1
+        score = 0
+
+        # for k in range(-len(boardMatrix) + 1, len(boardMatrix)):
+        for k in range(0, 2 * (len(boardMatrix) - 1) + 1):
+            # iStart = max(0, k)
+            iStart = max(0, k - len(boardMatrix) + 1)
+            # iEnd = min(len(boardMatrix) + k - 1, len(boardMatrix) - 1)
+            iEnd = min(len(boardMatrix) - 1, k)
+            for i in range(iStart, iEnd + 1):
+                j = k - i
+                # j=i-k
 
                 if boardMatrix[i][j] == ('B' if forBlack else 'W'):
                     consecutive += 1
@@ -181,9 +224,9 @@ class Minimax:
         if bestMove is not None:
             move[0] = bestMove[1]
             move[1] = bestMove[2]
-            # self.gameOver = True
+            self.gameOver = True
         else:
-            bestMove = self.minimaxSearchAB(depth, game_state, True, -1.0, self.getWinScore(),player_marker)
+            bestMove = self.minimaxSearchAB(depth, game_state, True, -1.0, self.getWinScore(), player_marker)
             if bestMove is None:
                 move = None
             else:
@@ -194,21 +237,42 @@ class Minimax:
 
         return move
 
-    def minimaxSearchAB(self, depth, game_state, maxPlayer, alpha, beta,player_marker):
+    # def calculateNextMove(self, depth):
+    #     move = [None, None]
+    #
+    #     bestMove = self.searchWinningMove(game_state)
+    #
+    #     if bestMove is not None:
+    #         move[0] = bestMove[1]
+    #         move[1] = bestMove[2]
+    #         self.gameOver = True
+    #     else:
+    #         bestMove = self.minimaxSearchAB(depth, self.board, True, -1.0, self.getWinScore())
+    #         if bestMove is None:
+    #             move = None
+    #         else:
+    #             move[0] = bestMove[1]
+    #             move[1] = bestMove[2]
+    #
+    #     self.evaluationCount = 0
+    #
+    #     return move
+
+    def minimaxSearchAB(self, depth, game_state, maxPlayer, alpha, beta, player_marker):
         # print("----------in minimax depth----------", depth)
         if depth == 0:
-            score =[self.evaluateBoardForWhite(game_state, not maxPlayer), None, None]
+            # lala=[self.evaluateBoardForWhite(game_state, not maxPlayer), None, None]
+            lala = [self.evaluateBoardForWhite(game_state, maxPlayer), None, None]
             # print("final move")
             # print(lala)
-            return score
+            return lala
 
-        # allPossibleMoves = self.generateMoves(game_state)
         allPossibleMoves = self.generate_all_adjacent_move(game_state)
         # print(allPossibleMoves)
         # return None;
 
-        # if len(allPossibleMoves) == 0:
-            # return [self.evaluateBoardForWhite(game_state, not maxPlayer), None, None]
+        if len(allPossibleMoves) == 0:
+            return [self.evaluateBoardForWhite(game_state, not maxPlayer), None, None]
 
         bestMove = [None, None, None]
 
@@ -219,22 +283,21 @@ class Minimax:
             for move in allPossibleMoves:
                 # from deepcopy import deepcopy, deepdeepcopy
                 # dummyBoard = deepdeepcopy(game_state)
-                dummyBoard=copy.deepcopy(game_state)
+                dummyBoard = copy.deepcopy(game_state)
                 # if dummyBoard[move[0]][move[1]]!='_':
                 #     continue
-                dummyBoard[move[0]][move[1]]='W '
+                dummyBoard[move[0]][move[1]] = 'W'
 
                 # dummyBoard.addStoneNoGUI(move[1], move[0], not maxPlayer)  # Pass the player_marker
 
-                tempMove = self.minimaxSearchAB(depth - 1, dummyBoard, not maxPlayer, alpha, beta,player_marker)
+                tempMove = self.minimaxSearchAB(depth - 1, dummyBoard, not maxPlayer, alpha, beta, player_marker)
                 # print("--------searching moves--------------")
                 # print("temp move", tempMove)
                 # dummyBoard[move[0]][move[1]] = '_'
                 if tempMove[0] > alpha:
                     alpha = tempMove[0]
 
-                # if tempMove[0] >= beta:
-                if alpha >= beta:
+                if tempMove[0] >= beta:
                     return tempMove
 
                 if tempMove[0] > bestMove[0]:
@@ -249,7 +312,7 @@ class Minimax:
             for move in allPossibleMoves:
                 dummyBoard = copy.deepcopy(game_state)
                 # dummyBoard.addStoneNoGUI(move[1], move[0], not maxPlayer)  # Pass the player_marker
-                dummyBoard[move[0]][move[1]]='B'
+                dummyBoard[move[0]][move[1]] = 'B'
 
                 tempMove = self.minimaxSearchAB(depth - 1, dummyBoard, not maxPlayer, alpha, beta, player_marker)
 
@@ -265,8 +328,8 @@ class Minimax:
                     bestMove[2] = move[1]
 
         return bestMove
-    def searchWinningMove(self, game_state,player_marker):
-        # allPossibleMoves = self.generate_possible_moves(game_state)
+
+    def searchWinningMove(self, game_state, player_marker):
         allPossibleMoves = self.generate_all_adjacent_move(game_state)
         winningMove = [None, None, None]
 
@@ -284,14 +347,28 @@ class Minimax:
 
         return None
 
+    # def searchWinningMove(self, game_state):
+    #     allPossibleMoves = self.generate_possible_moves(game_state)
+    #     winningMove = [None, None, None]
+    #
+    #     for move in allPossibleMoves:
+    #         self.evaluationCount += 1
+    #         dummyBoard = board.clone()
+    #         dummyBoard.addStoneNoGUI(move[1], move[0], False)
+    #
+    #         if self.getScore(dummyBoard, False, False) >= self.winScore:
+    #             winningMove[1] = move[0]
+    #             winningMove[2] = move[1]
+    #             return winningMove
+    #
+    #     return None
+
     def generate_possible_moves(self, game_state):
-        print("#-1")
         possible_moves = []
         for row in range(len(game_state)):
             for col in range(len(game_state[0])):
                 if game_state[row][col] == "_":
                     possible_moves.append((row, col))
-        print("possible moves: ", possible_moves)
         return possible_moves
 
     def generate_all_adjacent_move(selfslef, game_sate):
@@ -301,26 +378,24 @@ class Minimax:
         for row in range(len(game_sate)):
             for col in range(len(game_sate)):
                 if game_sate[row][col] == '_':
-                    if row != 0 and col !=0 and game_sate[row-1][col-1] != "_":
+                    if row != 0 and col != 0 and game_sate[row - 1][col - 1] != "_":
                         possible_moves.append((row, col))
-                    elif row != 0 and game_sate[row-1][col] != "_":
+                    elif row != 0 and game_sate[row - 1][col] != "_":
                         possible_moves.append((row, col))
-                    elif row != 0 and col !=9 and game_sate[row-1][col+1] != "_":
+                    elif row != 0 and col != 9 and game_sate[row - 1][col + 1] != "_":
                         possible_moves.append((row, col))
-                    elif col != 0 and  game_sate[row][col-1] != "_":
+                    elif col != 0 and game_sate[row][col - 1] != "_":
                         possible_moves.append((row, col))
-                    elif col != 9 and game_sate[row][col+1] != "_":
+                    elif col != 9 and game_sate[row][col + 1] != "_":
                         possible_moves.append((row, col))
-                    elif row != 9 and col != 0 and game_sate[row+1][col-1] != "_":
+                    elif row != 9 and col != 0 and game_sate[row + 1][col - 1] != "_":
                         possible_moves.append((row, col))
-                    elif row != 9 and game_sate[row+1][col] != "_":
+                    elif row != 9 and game_sate[row + 1][col] != "_":
                         possible_moves.append((row, col))
-                    elif row != 9 and col != 9 and game_sate[row+1][col+1] != "_":
+                    elif row != 9 and col != 9 and game_sate[row + 1][col + 1] != "_":
                         possible_moves.append((row, col))
         # print("possible moves: ", possible_moves)
         return possible_moves
-
-
 
     def generateMoves(self, game_state):
         moves = []
@@ -330,7 +405,7 @@ class Minimax:
                     moves.append((row, col))
         return moves
 
-    def display_board(slef, board):
-        for row in board:
+    def display_board(self):
+        for row in self.board:
             print(' '.join(row))
 

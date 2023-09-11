@@ -1,4 +1,3 @@
-
 import pygame
 from gomokuGame import GomokuGame
 from aiPlayer import AIPlayer
