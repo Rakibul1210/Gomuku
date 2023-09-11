@@ -1,5 +1,5 @@
 # Gomuku
-Mini Gomuku Game With AI9
+Mini Gomuku Game With AI
 # Gomoku AI Project
 
 ## Overview
